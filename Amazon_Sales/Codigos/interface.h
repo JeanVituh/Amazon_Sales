@@ -24,6 +24,7 @@ enum DOS_COLORS
     LIGHT_GRAY, DARK_GRAY, LIGHT_BLUE, LIGHT_GREEN, LIGHT_CYAN,
     LIGHT_RED, LIGHT_MAGENTA, YELLOW, WHITE
 };
+int Selecao2(char** dados, int qtde, int x, int y, int altura);
 int Selecao (char Dados [][120],int qtde, int x, int y, int largura, int altura, int escolha);
 void Borda(int x, int y, int largura, int altura, int tipo, int sombra);
 int Menu(char opcoes [][50], int x[],int y[], int tam[], int qtde, int opcao);

@@ -4,21 +4,29 @@
 #include "interface.h"
 #include "avl.h"
 #include "dados.h"
+#include "busca_binaria.h"
 
+AmazonSales ASales[50000];
 
-
-char* replace(char s[], char c1, char c2)
+char* limpaStringPreco(char s[])
 {
-    int l = strlen(s);
-    for (int i = 0; i < l; i++)
+    int writer = 0;
+    int reader = 0;
+
+    while (s[reader] != '\0')
     {
-        if (s[i] == c1)
-            s[i] = c2;
+        if ((s[reader] >= '0' && s[reader] <= '9') || s[reader] == '.')
+        {
+            s[writer] = s[reader];
+            writer++;
+        }
+        reader++;
     }
+
+    s[writer] = '\0';
     return s;
 }
 
-// SUA FUNÇÃO CarregaDados, EXATAMENTE COMO VOCÊ FORNECEU
 int CarregaDados()
 {
     FILE *fp = fopen("amazon.csv", "r");
@@ -27,10 +35,9 @@ int CarregaDados()
         printf("Nao abrir amazon.csv!\n");
         exit(1);
     }
-    char Linha[10000], *p, texto[10000]; // Declare texto
+    char Linha[10000], *p, texto[10000];
     int cont = 0, campo;
 
-    // Pula a linha do cabeçalho
     if(fscanf(fp, " %[^\n]", Linha) == EOF) return 0;
 
     while(fscanf(fp, " %[^\n]", Linha) != EOF && cont < 50000)
@@ -51,10 +58,10 @@ int CarregaDados()
             if(campo == 0) strcpy(ASales[cont].product_id, texto);
             if(campo == 1) strcpy(ASales[cont].product_name, texto);
             if(campo == 2) strcpy(ASales[cont].category, texto);
-            if(campo == 3) ASales[cont].discounted_price = strtof(replace(texto, ',', '.'), NULL);
-            if(campo == 4) ASales[cont].actual_price = strtof(replace(texto, ',', '.'), NULL);
+            if(campo == 3) ASales[cont].discounted_price = strtof(limpaStringPreco(texto), NULL);
+            if(campo == 4) ASales[cont].actual_price = strtof(limpaStringPreco(texto), NULL);
             if(campo == 5) ASales[cont].discount_percentage = atoi(texto);
-            if(campo == 6) ASales[cont].rating = strtof(replace(texto, ',', '.'), NULL);
+            if(campo == 6) ASales[cont].rating = strtof(texto, NULL);
             if(campo == 7) strcpy(ASales[cont].product_link, texto);
 
             p = strtok(NULL, ",");
@@ -64,13 +71,4 @@ int CarregaDados()
     }
     fclose(fp);
     return cont;
-}
-
-int Busca (int VET[], int n, int v) // BUSCA SEQUENCIAL PARA SER IMPLEMENTADA
-{
-    for (int i=0; i< n; i++)
-    {
-        if (VET[i]== v) return i;
-    }
-    return -1;
 }

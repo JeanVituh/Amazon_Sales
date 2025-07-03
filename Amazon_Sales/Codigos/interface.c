@@ -1,6 +1,7 @@
 #include "interface.h"
 #include <windows.h>
 #include <conio.h>
+
 int EntradaInserindo = 1;
 
 void tipocursor (int cursor)
@@ -27,7 +28,7 @@ int EntradaDados(int x, int y, int Tamanho, char Texto[])
     int Tecla, Pos;
     char aux[10000];
     gotoxy(x, y);
-    textcoloreback(BLACK, WHITE);
+    textcoloreback(WHITE, LIGHT_BLUE);
     printf("%*s", Tamanho, " ");
     gotoxy(x, y);
     printf("%s", Texto);
@@ -52,7 +53,6 @@ int EntradaDados(int x, int y, int Tamanho, char Texto[])
         }
         if(Tecla == TEC_DEL && Pos >= 0 && Texto[Pos] != 0)
         {
-//Pos--;
             strcpy(&Texto[Pos], &Texto[Pos+1]);
             printf("%s ", &Texto[Pos]);
 
@@ -63,7 +63,6 @@ int EntradaDados(int x, int y, int Tamanho, char Texto[])
             {
                 if(EntradaInserindo)
                 {
-// Inserir
                     if(strlen(Texto) < Tamanho)
                     {
                         if(Texto[Pos] == 0) Texto[Pos+1] = 0;
@@ -75,7 +74,6 @@ int EntradaDados(int x, int y, int Tamanho, char Texto[])
                 }
                 else
                 {
-// Sobrescreve
                     if(Texto[Pos] == 0) Texto[Pos+1] = 0;
                     Texto[Pos++] = Tecla;
                     printf("%c", Tecla);
@@ -87,8 +85,7 @@ int EntradaDados(int x, int y, int Tamanho, char Texto[])
         if(Pos > 0 && Texto[Pos-1] == 0) Pos--;
     }
     while(1);
-//Texto[Pos] = 0;
-    textcoloreback(BLACK, WHITE);
+    textcoloreback(WHITE, LIGHT_BLUE);
     gotoxy(67, 0);
     return Tecla;
 }
@@ -122,6 +119,15 @@ int Menu(char opcoes [][50], int x[],int y[], int tam[], int qtde, int opcao)
         Borda (x[opcao],y[opcao],tam[opcao],2,0,0);
         gotoxy(x[opcao]+1, y[opcao]+1);
         printf("%s", opcoes[opcao]);
+        if(tecla == TEC_BAIXO)
+        {
+            opcao++;
+        }
+
+        if (tecla == TEC_CIMA)
+        {
+            opcao--;
+        }
         if(tecla == TEC_DIR)opcao++;
         if (tecla == TEC_ESQ)opcao--;
         if (opcao<0) opcao = qtde -1;
@@ -184,7 +190,82 @@ void Borda(int x, int y, int largura, int altura, int tipo, int sombra)     // E
         for(i = 0; i < largura+2; i++) printf("\xb2");
     }
 }
+int Selecao2(char** dados, int qtde, int x, int y, int altura)
+{
+    int i, tecla;
+    int primeira = 0;
+    int escolha = 0;
 
+    if (altura > qtde)
+    {
+        altura = qtde;
+    }
+
+    while (1) // Usamos um loop infinito que será quebrado pelo return
+    {
+        for (i = 0; i < altura; i++)
+        {
+            gotoxy(x, y + i);
+            printf("%*s", -98, " ");
+            if (primeira + i < qtde)
+            {
+                gotoxy(x, y + i);
+                if (primeira + i == escolha)
+                {
+                    textbackground(DARK_GRAY);
+                }
+                else
+                {
+                    textbackground(LIGHT_BLUE);
+                }
+                printf("%s", dados[primeira + i]);
+            }
+        }
+        textbackground(LIGHT_BLUE);
+
+
+        tecla = getch();
+        if (tecla == 0 || tecla == 224)
+        {
+            tecla = getch();
+        }
+
+
+        switch (tecla)
+        {
+
+        case 72: // CIMA
+            if (escolha > 0)
+            {
+                escolha--;
+                if (escolha < primeira) primeira = escolha;
+            }
+            break;
+        case 80: // BAIXO
+            if (escolha < qtde - 1)
+            {
+                escolha++;
+                if (escolha >= primeira + altura) primeira = escolha - altura + 1;
+            }
+            break;
+
+        case 59:
+            return 1001; // F1 - Nosso código para ordenar por PREÇO
+        case 60:
+            return 1002; // F2 - Nosso código para ordenar por RATING
+        case 61:
+            return 1003; // F3 - NOSSO NOVO CÓDIGO PARA ORDENAR POR DESCONTO
+
+
+        // <<<====== AQUI ESTÁ A MUDANÇA IMPORTANTE ======>>>
+        case 27: // Tecla ESC
+            return -1; // Retorna -1 para indicar "cancelado"
+
+        case 13: // Tecla ENTER
+            return escolha; // Retorna o índice do item selecionado
+        }
+    }
+}
 int Selecao (char Dados [][120],int qtde, int x, int y, int largura, int altura, int escolha)
 {
     int i, primeira=0, tecla;
@@ -207,7 +288,8 @@ int Selecao (char Dados [][120],int qtde, int x, int y, int largura, int altura,
     return escolha;
 }
 
-int converterIntHora(int horario, char string[]) {
+int converterIntHora(int horario, char string[])
+{
     char horario_formatado[6];
 
     snprintf(horario_formatado, sizeof(horario_formatado), "%02d:%02d", horario / 100, horario % 100);
@@ -217,7 +299,8 @@ int converterIntHora(int horario, char string[]) {
     return string;
 }
 
-int converterIntData(int data, char string[]) {
+int converterIntData(int data, char string[])
+{
     char Data_formatada[15];
     int mes = (data / 10000) % 100;
     int dia = data/1000000;
